@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Control RORI</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 100px; }
+    button { font-size: 24px; padding: 20px 40px; border-radius: 10px; }
+    #resultado { margin-top: 30px; font-size: 20px; }
+  </style>
+</head>
+<body>
+  <h1>🚪 Abrir Pluma RORI</h1>
+  <button onclick="abrir()">🔓 ABRIR</button>
+  <div id="resultado"></div>
+
+  <script>
+      async function abrir() {
+    const resultado = document.getElementById("resultado");
+    resultado.textContent = "⏳ Enviando señal...";
+
+    try {
+      const res = await fetch("https://4190-187-134-212-233.ngrok-free.app/abrir?dispositivo=esp32/1", {
+        method: "POST"
+      });
+
+      if (!res.ok) {
+        throw new Error("Código HTTP " + res.status);
+      }
+
+      const data = await res.json();
+
+      if (data.ok) {
+        resultado.textContent = "✅ Apertura exitosa: " + data.mensaje;
+      } else {
+        resultado.textContent = "⚠️ Error: " + data.mensaje;
+      }
+    } catch (err) {
+      resultado.textContent = "❌ No se pudo conectar: " + err.message;
+    }
+  }
+
+  </script>
+</body>
+</html>
