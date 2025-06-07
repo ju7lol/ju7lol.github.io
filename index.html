@@ -28,7 +28,7 @@
       status.textContent = "⏳ Enviando orden a " + dispositivo + "...";
 
       try {
-        const res = await fetch(`https://39d8-187-134-212-233.ngrok-free.app/abrir?dispositivo=${dispositivo}`, {
+        const res = await fetch(`https://rori-caja.onrender.com/abrir?dispositivo=${dispositivo}`, {
           method: "POST"
         });
         const data = await res.json();
