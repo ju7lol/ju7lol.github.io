@@ -28,7 +28,7 @@
       status.textContent = "⏳ Enviando orden a " + dispositivo + "...";
 
       try {
-        const res = await fetch(`https://rori-caja.onrender.com/abrir?dispositivo=esp32/1`, {
+        const res = await fetch(`https://rori-caja.onrender.com/abrir?dispositivo=${dispositivo}`, {
           method: "POST"
         });
         const data = await res.json();
