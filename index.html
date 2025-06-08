@@ -26,17 +26,17 @@
     async function abrir(accion) {
       const status = document.getElementById("status");
       status.textContent = "⏳ Enviando orden: " + accion;
-
+  
       try {
         const res = await fetch(`https://rori-caja.onrender.com/abrir`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            dispositivo: "esp32/1", // o esp32/3 si es otro ESP
-            mensaje: accion         // aquí va abrir1, abrir2, abrir3
+            dispositivo: "esp32/1",
+            mensaje: accion
           })
         });
-
+  
         const data = await res.json();
         if (data.ok) {
           status.textContent = `✅ Acción ${accion} ejecutada correctamente.`;
@@ -47,6 +47,7 @@
         status.textContent = "⚠️ Error de conexión: " + err.message;
       }
     }
-  </script>
+</script>
+
 </body>
 </html>
