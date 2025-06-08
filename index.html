@@ -16,25 +16,30 @@
 <body>
   <h1>📡 Panel de Acceso RORI</h1>
 
-  <button onclick="abrir('esp32/1')">🔓 Abrir Pluma 1</button>
-  <button onclick="abrir('esp32/2')">🔓 Abrir Pluma 2</button>
-  <button onclick="abrir('esp32/3')">🔓 Abrir Entrada Peatonal</button>
+  <button onclick="abrir('abrir1')">🔓 Abrir Pluma 1</button>
+  <button onclick="abrir('abrir2')">🔓 Abrir Pluma 2</button>
+  <button onclick="abrir('abrir3')">🚪 Abrir Entrada Peatonal</button>
 
   <div id="status" class="status"></div>
 
   <script>
-    async function abrir(dispositivo) {
+    async function abrir(accion) {
       const status = document.getElementById("status");
-      status.textContent = "⏳ Enviando orden a " + dispositivo + "...";
+      status.textContent = "⏳ Enviando orden: " + accion;
 
       try {
-        const res = await fetch(`https://rori-caja.onrender.com/abrir?dispositivo=${dispositivo}`, {
-          method: "POST"
+        const res = await fetch(`https://rori-caja.onrender.com/abrir`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            dispositivo: "esp32/1", // o esp32/3 si es otro ESP
+            mensaje: accion         // aquí va abrir1, abrir2, abrir3
+          })
         });
-        const data = await res.json();
 
+        const data = await res.json();
         if (data.ok) {
-          status.textContent = `✅ ${dispositivo} activado correctamente.`;
+          status.textContent = `✅ Acción ${accion} ejecutada correctamente.`;
         } else {
           status.textContent = `❌ Error: ${data.mensaje || data.error}`;
         }
