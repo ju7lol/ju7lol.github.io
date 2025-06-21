@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de Control RORI</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    h1 { margin-bottom: 40px; }
+    button {
+      font-size: 20px; margin: 10px; padding: 15px 30px;
+      border-radius: 10px; cursor: pointer;
+    }
+    input { font-size: 20px; padding: 10px; margin: 10px; border-radius: 10px; }
+    .status { margin-top: 30px; font-size: 18px; }
+    .log { margin-top: 40px; text-align: left; display: inline-block; max-width: 600px; }
+    .log-entry { border-bottom: 1px solid #ccc; padding: 5px 0; }
+  </style>
+</head>
+<body>
+  <h1>📡 Panel de Acceso RORI</h1>
+
+  <input type="text" id="codigoInput" placeholder="Ingresa código de invitación" />
+  <button onclick="enviarCodigo()">✅ Validar Código</button>
+
+  <br><br>
+  <button onclick="abrir('esp32/1')">🔓 Abrir Pluma 1</button>
+  <button onclick="abrir('esp32/2')">🔓 Abrir Pluma 2</button>
+
+  <div id="status" class="status"></div>
+
+  <div class="log" id="log">
+    <h2>📝 Registro de Accesos</h2>
+  </div>
+
+  <script>
+    async function enviarCodigo() {
+      const codigo = document.getElementById("codigoInput").value.trim();
+      const status = document.getElementById("status");
+
+      if (!codigo) {
+        status.textContent = "⚠️ Ingresa un código antes de validar.";
+        return;
+      }
+
+      status.textContent = `⏳ Validando código: ${codigo}...`;
+
+      try {
+        const res = await fetch("https://rori-caja.onrender.com/validar_invitacion", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ codigo: codigo })
+        });
+
+        const data = await res.json();
+
+        if (data.valid) {
+          status.textContent = `✅ Acceso permitido. Anfitrión: ${data.anfitrion}`;
+          logInvitacion(codigo, data.id_invitacion);
+        } else {
+          status.textContent = "❌ Acceso denegado.";
+          logInvitacion(codigo, "RECHAZADO");
+        }
+
+      } catch (err) {
+        status.textContent = "⚠️ Error de conexión: " + err.message;
+      }
+    }
+
+    async function abrir(dispositivo) {
+      const status = document.getElementById("status");
+      status.textContent = "⏳ Enviando orden a " + dispositivo + "...";
+
+      try {
+        const res = await fetch(`https://rori-caja.onrender.com/abrir?dispositivo=${dispositivo}`, {
+          method: "POST"
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          status.textContent = `✅ ${dispositivo} activado correctamente.`;
+        } else {
+          status.textContent = `❌ Error: ${data.mensaje || data.error}`;
+        }
+      } catch (err) {
+        status.textContent = "⚠️ Error de conexión: " + err.message;
+      }
+    }
+
+    function logInvitacion(codigo, info) {
+      const log = document.getElementById("log");
+      const entry = document.createElement("div");
+      entry.className = "log-entry";
+
+      const fechaHora = new Date().toLocaleString();
+      entry.textContent = `🔑 Código: ${codigo} | Resultado: ${info} | ${fechaHora}`;
+
+      log.appendChild(entry);
+    }
+  </script>
+</body>
+</html>
